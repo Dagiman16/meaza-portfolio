@@ -75,7 +75,7 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <h3 className="text-xs font-bold">Email</h3>
-                  <a href="meazayimer202@gmail.com" className="text-blue-300 text-xs block truncate">meazayimer202@gmail.com</a>
+                  <a href="mailto:meaza@example.com" className="text-blue-300 text-xs block truncate">meazayimer202@gmail.com</a>
                 </div>
                 
                 <div className="bg-white/10 rounded-lg p-1.5 text-center cursor-pointer">

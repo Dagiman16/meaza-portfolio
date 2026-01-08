@@ -12,6 +12,8 @@ const ThreeScene = dynamic(() => import('../components/ThreeScene'), {
 export default function Home() {
   const [currentSection, setCurrentSection] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const sections = [
     'hero',
@@ -21,6 +23,42 @@ export default function Home() {
     'experience',
     'contact'
   ];
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: TouchEvent) => {
+    setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
+    setTouchStart(e.targetTouches[0].clientY);
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientY);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isUpSwipe = distance > minSwipeDistance;
+    const isDownSwipe = distance < -minSwipeDistance;
+
+    if (isScrolling) return;
+
+    if (isUpSwipe && currentSection < sections.length - 1) {
+      // Swipe up - go to next section
+      setIsScrolling(true);
+      setCurrentSection(prev => prev + 1);
+      setTimeout(() => setIsScrolling(false), 1000);
+    }
+
+    if (isDownSwipe && currentSection > 0) {
+      // Swipe down - go to previous section
+      setIsScrolling(true);
+      setCurrentSection(prev => prev - 1);
+      setTimeout(() => setIsScrolling(false), 1000);
+    }
+  };
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -52,14 +90,25 @@ export default function Home() {
       }
     };
 
+    // Add touch event listeners
+    const handleTouchStart = (e: TouchEvent) => onTouchStart(e);
+    const handleTouchMove = (e: TouchEvent) => onTouchMove(e);
+    const handleTouchEnd = () => onTouchEnd();
+
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
     
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [currentSection, isScrolling, sections.length]);
+  }, [currentSection, isScrolling, sections.length, touchStart, touchEnd]);
 
   const scrollToSection = (index: number) => {
     if (isScrolling) return;
@@ -69,7 +118,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-100">
+    <div className="h-screen overflow-hidden bg-gray-100 touch-pan-y">
       {/* Enhanced Fixed Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -169,6 +218,19 @@ export default function Home() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Mobile Touch Instructions */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40 lg:hidden">
+        <div className="bg-black/70 text-white px-4 py-2 rounded-full text-xs flex items-center space-x-2 backdrop-blur-sm">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+          </svg>
+          <span>Swipe up/down to navigate</span>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+          </svg>
+        </div>
       </div>
 
       {/* Sections Container */}

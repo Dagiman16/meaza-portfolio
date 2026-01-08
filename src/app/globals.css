@@ -22,6 +22,9 @@
 html {
   scroll-behavior: smooth;
   overflow: hidden;
+  /* Improve touch scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 body {
@@ -37,6 +40,16 @@ body {
   height: 100vh;
   overflow: hidden;
   cursor: default;
+  /* Improve touch responsiveness */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Enable hardware acceleration for smooth scrolling */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -164,7 +177,7 @@ section {
   }
 }
 
-/* Touch-friendly interactions */
+/* Touch-friendly interactions and mobile scrolling */
 @media (hover: none) and (pointer: coarse) {
   .hover\:scale-110:hover {
     transform: scale(1.05);
@@ -179,6 +192,88 @@ section {
   .hover\:-translate-y-2:hover {
     transform: translateY(-4px);
     cursor: pointer !important;
+  }
+  
+  /* Enable smooth touch scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
+  }
+  
+  /* Improve touch target sizes */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Mobile touch scrolling container */
+.touch-pan-y {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Smooth section transitions with hardware acceleration */
+.section-transition {
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Mobile swipe indicator animation */
+@keyframes swipeIndicator {
+  0%, 100% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}
+
+.swipe-indicator {
+  animation: swipeIndicator 2s ease-in-out infinite;
+}
+
+/* Prevent text selection during swipe gestures */
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Enhanced mobile viewport handling */
+@media screen and (max-width: 768px) {
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    height: -webkit-fill-available;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Improve touch responsiveness */
+  .touch-responsive {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mobile-specific section spacing */
+  section {
+    padding: 2rem 1rem;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
   }
 }
 
